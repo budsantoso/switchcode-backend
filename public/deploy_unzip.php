@@ -10,14 +10,14 @@ if (($_GET['key'] ?? '') !== $secret) {
 header('Content-Type: application/json');
 
 $rootPath = dirname(__DIR__);
-$zipFile = $rootPath . '/release.zip';
+// release.zip diupload ke folder public atau root
+$zipFile = file_exists(__DIR__ . '/release.zip') ? __DIR__ . '/release.zip' : $rootPath . '/release.zip';
 
 if (!file_exists($zipFile)) {
     die(json_encode([
         'status' => 'error',
-        'message' => 'release.zip not found at ' . $zipFile,
-        'rootPath' => $rootPath,
-        'root_files' => scandir($rootPath)
+        'message' => 'release.zip not found',
+        'checked' => [__DIR__ . '/release.zip', $rootPath . '/release.zip'],
     ]));
 }
 

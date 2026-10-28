@@ -38,13 +38,11 @@ jobs:
 
       - name: Create Release Package
         run: |
-          mkdir -p dist
-          # Compress whole project
-          zip -q -r dist/release.zip . -x ".git/*" ".github/*" "tests/*" "dist/*"
-          # Copy helper unzipper
           mkdir -p dist/public
-          cp deploy_unzip.php dist/deploy_unzip.php
-          cp deploy_unzip.php dist/public/deploy_unzip.php
+          # Compress whole project ke dist/public/release.zip
+          zip -q -r dist/public/release.zip . -x ".git/*" ".github/*" "tests/*" "dist/*"
+          cp public/deploy_unzip.php dist/public/deploy_unzip.php
+          cp public/artisan_runner.php dist/public/artisan_runner.php
 
       - name: Upload Package via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
