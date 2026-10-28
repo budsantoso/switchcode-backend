@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Articles Management
         Route::get('/articles', [ArticleController::class, 'adminIndex']);
         Route::post('/articles', [ArticleController::class, 'store']);
+        Route::post('/articles/upload-image', [ArticleController::class, 'uploadImage']);
         Route::match(['put', 'post'], '/articles/{id}', [ArticleController::class, 'update']);
         Route::delete('/articles/{id}', [ArticleController::class, 'destroy']);
 

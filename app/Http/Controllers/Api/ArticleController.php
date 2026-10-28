@@ -189,4 +189,24 @@ class ArticleController extends Controller
             'message' => 'Berita berhasil dihapus',
         ]);
     }
+
+    // Admin Upload Media/Image for WYSIWYG
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|max:10240', // Max 10MB
+        ]);
+
+        $path = $request->file('image')->store('articles/inline', 'public');
+        $fullUrl = url('storage/' . $path);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Gambar berhasil diunggah',
+            'data' => [
+                'path' => $path,
+                'url' => $fullUrl,
+            ],
+        ]);
+    }
 }
