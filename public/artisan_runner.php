@@ -31,6 +31,13 @@ try {
             @symlink($target, $link);
         }
         echo "Storage symlink created manually: " . (is_link($link) ? 'SUCCESS' : 'FAILED') . "\n";
+    } elseif ($cmd === 'check:files') {
+        $dir = __DIR__ . '/../storage/app/public';
+        echo "Storage dir: {$dir}\n";
+        echo "Exists: " . (is_dir($dir) ? 'YES' : 'NO') . "\n";
+        if (is_dir($dir . '/articles/inline')) {
+            print_r(scandir($dir . '/articles/inline'));
+        }
     } else {
         Artisan::call($cmd, ['--force' => true]);
     }
