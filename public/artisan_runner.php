@@ -24,13 +24,14 @@ echo "Running Artisan command: {$cmd}\n\n";
 try {
     if ($cmd === 'migrate:fresh' || $cmd === 'migrate:fresh --seed') {
         Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
-    } elseif ($cmd === 'storage:link') {
-        $target = __DIR__ . '/../storage/app/public';
-        $link = __DIR__ . '/storage';
-        if (!file_exists($link)) {
-            @symlink($target, $link);
-        }
-        echo "Storage symlink created manually: " . (is_link($link) ? 'SUCCESS' : 'FAILED') . "\n";
+    } elseif ($cmd === 'fix:content_urls') {
+        // Ganti url storage lama ke api/storage
+        \Illuminate\Support\Facades\DB::table('articles')
+            ->where('content', 'like', '%api.switchcode.id/storage/%')
+            ->update([
+                'content' => \Illuminate\Support\Facades\DB::raw("REPLACE(content, 'api.switchcode.id/storage/', 'api.switchcode.id/api/storage/')")
+            ]);
+        echo "Updated old image URLs in articles table!\n";
     } elseif ($cmd === 'check:files') {
         $dir = __DIR__ . '/../storage/app/public';
         echo "Storage dir: {$dir}\n";

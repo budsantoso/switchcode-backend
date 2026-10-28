@@ -19,6 +19,17 @@ Route::middleware('throttle:60,1')->group(function () {
 
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
+
+    // Serve public storage images via API route
+    Route::get('/storage/{path}', function ($path) {
+        $fullPath = storage_path('app/public/' . $path);
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        $mimeType = mime_content_type($fullPath) ?: 'application/octet-stream';
+        return response()->file($fullPath, ['Content-Type' => $mimeType]);
+    })->where('path', '.*');
 });
 
 /*

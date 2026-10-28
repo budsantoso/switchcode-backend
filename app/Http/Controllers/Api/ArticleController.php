@@ -198,7 +198,7 @@ class ArticleController extends Controller
         ]);
 
         $path = $request->file('image')->store('articles/inline', 'public');
-        $fullUrl = 'https://api.switchcode.id/storage/' . $path;
+        $fullUrl = 'https://api.switchcode.id/api/storage/' . $path;
 
         return response()->json([
             'success' => true,
