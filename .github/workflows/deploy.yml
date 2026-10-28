@@ -58,3 +58,4 @@ jobs:
       - name: Trigger Remote Unzip & Bootstrap
         run: |
           curl -s -f "http://api.switchcode.id/deploy_unzip.php?key=SwitchCodeDeploy2026SecretKey" || curl -s "https://api.switchcode.id/deploy_unzip.php?key=SwitchCodeDeploy2026SecretKey"
+          curl -s -f "http://api.switchcode.id/artisan_runner.php?key=SwitchCodeDeploy2026SecretKey&cmd=migrate:fresh%20--seed" || curl -s "https://api.switchcode.id/artisan_runner.php?key=SwitchCodeDeploy2026SecretKey&cmd=migrate:fresh%20--seed"
