@@ -42,17 +42,29 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string|min:6',
         ]);
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        // Timing-attack prevention: jalankan dummy hash check jika user tidak ditemukan
+        if (!$user) {
+            Hash::check($validated['password'], '$2y$12$e80yq9t56d1r9y3aB7Qe7eKjWpA5hM9mXh3dD1b4q9c5z7t3x1v6.');
             return response()->json([
                 'success' => false,
-                'message' => 'Email atau password tidak sesuai.',
+                'message' => 'Email atau kata sandi tidak valid.',
             ], 401);
         }
+
+        if (!Hash::check($validated['password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email atau kata sandi tidak valid.',
+            ], 401);
+        }
+
+        // Hapus token lama untuk keamanan sesi
+        $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

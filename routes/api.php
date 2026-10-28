@@ -7,17 +7,19 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Public Routes (Protected with Anti Brute-Force Rate Limiting)
 |--------------------------------------------------------------------------
 */
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::middleware('throttle:register')->post('/auth/register', [AuthController::class, 'register']);
+Route::middleware('throttle:login')->post('/auth/login', [AuthController::class, 'login']);
 
-Route::get('/articles', [ArticleController::class, 'index']);
-Route::get('/articles/{slug}', [ArticleController::class, 'show']);
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::get('/articles/{slug}', [ArticleController::class, 'show']);
 
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{slug}', [ProductController::class, 'show']);
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{slug}', [ProductController::class, 'show']);
+});
 
 /*
 |--------------------------------------------------------------------------
