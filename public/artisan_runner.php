@@ -16,13 +16,19 @@ use Illuminate\Contracts\Console\Kernel;
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-$cmd = $_GET['cmd'] ?? 'migrate:fresh --seed';
+$cmd = $_GET['cmd'] ?? 'migrate';
 
 echo "<pre>";
-echo "Running: php artisan {$cmd}\n\n";
+echo "Running Artisan command: {$cmd}\n\n";
 
 try {
-    Artisan::call($cmd, ['--force' => true]);
+    if ($cmd === 'migrate:fresh' || $cmd === 'migrate:fresh --seed') {
+        Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+    } elseif ($cmd === 'storage:link') {
+        Artisan::call('storage:link', ['--force' => true]);
+    } else {
+        Artisan::call($cmd, ['--force' => true]);
+    }
     echo Artisan::output();
 } catch (\Throwable $e) {
     echo "ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString();
