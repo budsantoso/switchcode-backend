@@ -1,0 +1,50 @@
+name: Deploy Laravel Backend to cPanel
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Build & Deploy via FTP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, bcmath, fileinfo
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Prepare Production .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+          sed -i "s/APP_ENV=local/APP_ENV=production/g" .env
+          sed -i "s/APP_DEBUG=true/APP_DEBUG=false/g" .env
+          sed -i "s|APP_URL=http://localhost|APP_URL=https://api.switchcode.id|g" .env
+          sed -i "s/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/g" .env
+          sed -i "s/DB_DATABASE=laravel/DB_DATABASE=${{ secrets.DB_DATABASE }}/g" .env
+          sed -i "s/DB_USERNAME=root/DB_USERNAME=${{ secrets.DB_USERNAME }}/g" .env
+          sed -i "s/DB_PASSWORD=/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/g" .env
+
+      - name: Sync Files to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/api.switchcode.id/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/tests/**
+            **/node_modules/**
