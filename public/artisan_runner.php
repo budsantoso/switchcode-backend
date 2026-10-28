@@ -25,7 +25,12 @@ try {
     if ($cmd === 'migrate:fresh' || $cmd === 'migrate:fresh --seed') {
         Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
     } elseif ($cmd === 'storage:link') {
-        Artisan::call('storage:link', ['--force' => true]);
+        $target = __DIR__ . '/../storage/app/public';
+        $link = __DIR__ . '/storage';
+        if (!file_exists($link)) {
+            @symlink($target, $link);
+        }
+        echo "Storage symlink created manually: " . (is_link($link) ? 'SUCCESS' : 'FAILED') . "\n";
     } else {
         Artisan::call($cmd, ['--force' => true]);
     }
